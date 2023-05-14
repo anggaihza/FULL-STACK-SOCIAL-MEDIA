@@ -49,7 +49,7 @@
         padding: 50px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         margin-bottom: 20px;
 
         @include mobile {
@@ -81,7 +81,8 @@
           gap: 10px;
 
           span {
-            font-size: 30px;
+            margin-top: 40px;
+            font-size: 20px;
             font-weight: 500;
           }
 
@@ -89,7 +90,7 @@
             width: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-around;
+            justify-content: space-between;
 
             .item {
               display: flex;
@@ -118,6 +119,20 @@
           align-items: center;
           justify-content: flex-end;
           gap: 10px;
+          button {
+            border: none;
+            background-color: #5271ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+          div {
+            padding-top: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
         }
       }
     }

@@ -39,20 +39,18 @@ const Profile = () => {
         </div>
         <div className="profileContainer">
           <div className="uInfo">
-            <div className="left">
-              <a href="http://facebook.com">
-                <FacebookTwoToneIcon fontSize="large" />
-              </a>
-              <a href="http://facebook.com">
-                <InstagramIcon fontSize="large" />
-              </a>
-            </div>
             <div className="center">
-              <span>{data?.username}</span>
-              <button onClick={() => setOpenUpdate(true)}>update</button>
+              <span>{data?.fullname}</span>
+              <p>Email: {data?.email}</p>
+              <p className="bio">Bio: {data?.bio}</p>
             </div>
             <div className="right">
-              <EmailOutlinedIcon />
+              <div>
+                <button onClick={() => setOpenUpdate(true)}>update</button>
+                <button onClick={() => setOpenUpdate(true)}>
+                  Verification
+                </button>
+              </div>
               <MoreVertIcon />
             </div>
           </div>

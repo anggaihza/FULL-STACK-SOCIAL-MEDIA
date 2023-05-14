@@ -8,6 +8,8 @@ const Update = ({setOpenUpdate, user}) => {
   const [profile, setProfile] = useState(null);
   const [texts, setTexts] = useState({
     username: user.username,
+    fullname: user.fullname,
+    bio: user.bio,
   });
 
   const upload = async (file) => {
@@ -16,9 +18,9 @@ const Update = ({setOpenUpdate, user}) => {
       formData.append("file", file);
       const res = await makeRequest.post("/upload", formData);
       return res.data;
-      console.log(res);
     } catch (error) {
       console.log(error);
+      alert(error.response.data.msg);
     }
   };
 
@@ -73,6 +75,18 @@ const Update = ({setOpenUpdate, user}) => {
             type="text"
             name="username"
             placeholder="Username"
+            onChange={handleChange}
+          />
+          <input
+            type="text"
+            name="fullname"
+            placeholder="Fullname"
+            onChange={handleChange}
+          />
+          <input
+            type="text"
+            name="bio"
+            placeholder="bio"
             onChange={handleChange}
           />
           <button onClick={handleClick}>update</button>

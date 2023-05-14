@@ -41,14 +41,14 @@ module.exports = {
 
     },
     login: (req, res) => {
-        const q = "SELECT * FROM users WHERE username = ?"
+        const q = "SELECT * FROM users WHERE username = ? OR email = ?"
 
-        db.query(q, [req.body.username], (err, data) => {
+        db.query(q, [req.body.username, req.body.username], (err, data) => {
             if (err) return res.status(500).json(err)
             if (data.length === 0) return res.status(404).json({ msg: "User not found" })
 
             const checkPassword = bcrypt.compareSync(req.body.password, data[0].password)
-            if (!checkPassword) return res.status(400).json({ msg: "Wrong password or username" })
+            if (!checkPassword) return res.status(400).json({ msg: "Wrong password" })
 
             const token = jwt.sign({ id: data[0].id }, "JWT")
 
