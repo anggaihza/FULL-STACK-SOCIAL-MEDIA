@@ -50,9 +50,14 @@ const Reset = () => {
             />
 
             {error && error}
-            <button disabled={isSubmitting} onClick={handleClick}>
-              Send Email
-            </button>
+            <div className="button">
+              <button disabled={isSubmitting} onClick={handleClick}>
+                Send Email
+              </button>
+              <Link to="/login">
+                <button disabled={isSubmitting}>Login</button>
+              </Link>
+            </div>
           </form>
         </div>
       </div>

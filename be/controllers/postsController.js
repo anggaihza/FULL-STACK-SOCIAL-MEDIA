@@ -27,10 +27,10 @@ module.exports = {
             if (err) return res.status(400).json({ msg: "Token is not valid!" })
 
 
-            const q = "INSERT INTO posts (`desc`, `image`, `userId`, `createdAt`) VALUES (?)";
+            const q = "INSERT INTO posts (`caption`, `image`, `userId`, `createdAt`) VALUES (?)";
 
             const values = [
-                req.body.desc,
+                req.body.caption,
                 req.body.image,
                 userInfo.id,
                 moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
@@ -60,5 +60,34 @@ module.exports = {
             })
 
         })
-    }
+    },
+    updatePost: (req, res) => {
+        const token = req.cookies.accessToken;
+        if (!token) return res.status(401).json({ msg: "Not logged in!" });
+
+        jwt.verify(token, "JWT", (err, userInfo) => {
+            if (err) return res.status(400).json({ msg: "Token is not valid!" });
+
+            const postId = req.params.id;
+            const newCaption = req.body.caption;
+
+            const q = "SELECT * FROM posts WHERE id=? AND userId=?";
+            db.query(q, [postId, userInfo.id], (err, data) => {
+                if (err) return res.status(500).json(err);
+
+                if (data.length === 0) {
+                    return res.status(404).json({ msg: "Post not found" });
+                }
+
+                const post = data[0];
+
+                const q = "UPDATE posts SET caption=? WHERE id=?";
+                db.query(q, [newCaption, post.id], (err, data) => {
+                    if (err) return res.status(500).json(err);
+
+                    return res.status(200).json({ msg: "Post caption updated" });
+                });
+            });
+        });
+    },
 }

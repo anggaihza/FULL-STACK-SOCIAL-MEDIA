@@ -83,8 +83,8 @@ const Login = () => {
               Login
             </button>
           </form>
-          <Link to="/forget">
-            <button>Forget Password</button>
+          <Link to="/reset" className="reset">
+            <button className="resetBtn">Reset / Forgot Password</button>
           </Link>
         </div>
       </div>

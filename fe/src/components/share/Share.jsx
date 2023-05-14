@@ -9,7 +9,7 @@ import {useMutation, QueryClient} from "@tanstack/react-query";
 
 const Share = () => {
   const [file, setFile] = useState(null);
-  const [desc, setDesc] = useState("");
+  const [caption, setCaption] = useState("");
 
   const upload = async () => {
     try {
@@ -43,8 +43,8 @@ const Share = () => {
     e.preventDefault();
     let imgUrl = "";
     if (file) imgUrl = await upload();
-    mutation.mutate({desc, image: imgUrl});
-    setDesc("");
+    mutation.mutate({caption, image: imgUrl});
+    setCaption("");
     setFile(null);
   };
   return (
@@ -55,9 +55,9 @@ const Share = () => {
             {/* <img src={"/upload/" + currentUser.profilePic} alt="" /> */}
             <input
               type="text"
-              placeholder={`What's on your mind ${currentUser.name}?`}
-              onChange={(e) => setDesc(e.target.value)}
-              value={desc}
+              placeholder={`What's on your mind ${currentUser.username}?`}
+              onChange={(e) => setCaption(e.target.value)}
+              value={caption}
             />
           </div>
           <div className="right">

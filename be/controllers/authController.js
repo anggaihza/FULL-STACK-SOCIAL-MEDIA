@@ -213,7 +213,4 @@ module.exports = {
             sameSite: "none"
         }).status(200).json({ msg: "User has been logged Out" })
     }
-
-
-
 }

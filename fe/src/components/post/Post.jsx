@@ -12,9 +12,11 @@ import moment from "moment";
 import {makeRequest} from "../../axios";
 import {useQuery, useMutation, QueryClient} from "@tanstack/react-query";
 import {AuthContext} from "../../context/authContext";
+import EditPost from "../editPost/EditPost";
 
 const Post = ({post}) => {
   const [commentOpen, setCommentOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const {currentUser} = useContext(AuthContext);
@@ -90,7 +92,7 @@ const Post = ({post}) => {
           )}
         </div>
         <div className="content">
-          <p>{post.desc}</p>
+          <p>{post.caption}</p>
           <img src={"./upload/" + post.image} alt="" />
         </div>
         <div className="info">
@@ -113,7 +115,12 @@ const Post = ({post}) => {
           </div>
           <div className="item">
             <ShareOutlinedIcon />
-            Share
+            <div
+              className="item"
+              onClick={() => setCommentOpen(!editOpen)}></div>
+            {currentUser && currentUser.id === post.userId && (
+              <EditPost postId={post.id} />
+            )}
           </div>
         </div>
         {commentOpen && <Comments postId={post.id} />}
