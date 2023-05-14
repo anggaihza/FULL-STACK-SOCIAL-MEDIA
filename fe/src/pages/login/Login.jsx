@@ -83,6 +83,9 @@ const Login = () => {
               Login
             </button>
           </form>
+          <Link to="/forget">
+            <button>Forget Password</button>
+          </Link>
         </div>
       </div>
     </div>
