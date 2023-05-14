@@ -15,6 +15,8 @@ app.use(cookieParser())
 app.use(cors({
     origin: "http://localhost:3000",
 }))
+app.set("view engine", "ejs")
+app.use(express.urlencoded({ extended: false }))
 
 
 const storage = multer.diskStorage({

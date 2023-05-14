@@ -10,7 +10,7 @@
     display: flex;
     background-color: white;
     border-radius: 10px;
-    min-height: 600px;
+    min-height: 300px;
     overflow: hidden;
 
     .left {
@@ -75,8 +75,9 @@
           width: 50%;
           padding: 10px;
           border: none;
-          background-color: #938eef;
+          background-color: #663399;
           color: white;
+          border-radius: 30px;
           font-weight: bold;
           cursor: pointer;
         }

@@ -17,6 +17,7 @@ import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query"
+import Reset from "./pages/reset/Reset";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -76,6 +77,10 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    {
+      path: "/reset",
+      element: <Reset />,
     },
   ]);
 

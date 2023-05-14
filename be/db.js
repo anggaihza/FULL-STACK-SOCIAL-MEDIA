@@ -7,4 +7,6 @@ const db = mysql.createConnection({
     database: "social"
 })
 
+
+
 module.exports = { db }

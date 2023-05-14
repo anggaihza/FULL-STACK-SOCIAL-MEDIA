@@ -3,12 +3,25 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 
+const express = require("express")
+const app = express()
+app.set("view engine", "ejs")
+
 // Import the email template file
 const fs = require("fs")
 const path = require("path")
 const emailTemplatePath = path.join(__dirname, "email-verification.html");
 const emailTemplate = fs.readFileSync(emailTemplatePath, "utf8");
 // const emailTemplate = fs.readFileSync("./email-verification.html", "utf8")
+
+// set up nodemailer ##
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "ihzasukarya@gmail.com",
+        pass: "sqnlrlrfopagejex"
+    }
+})
 
 module.exports = {
     register: (req, res) => {
@@ -40,23 +53,16 @@ module.exports = {
             // create user
             const q = "INSERT INTO users (`username`, `email`, `password`, `status`, `verification_token`) VALUES (?, ?, ?, ?, ?)"
 
-            const token_verification = jwt.sign({ email: req.body.email }, "VERIFY")
+            const token_verification = jwt.sign({ email: req.body.email }, "JWT")
             const values = [req.body.username, req.body.email, hashedPassword, "unverified", token_verification]
             db.query(q, values, (err, data) => {
                 if (err) return res.status(500).json(err)
 
-                // Replace the {{verificationLink}} placeholder with the actual verification link
+
                 const verificationLink = `http://${req.headers.host}/auth/verify-email/${token_verification}`
                 const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink)
 
-                // set up nodemailer ##
-                const transporter = nodemailer.createTransport({
-                    service: "gmail",
-                    auth: {
-                        user: "ihzasukarya@gmail.com",
-                        pass: "sqnlrlrfopagejex"
-                    }
-                })
+
 
                 const mailOptions = {
                     from: "verify your email",
@@ -100,6 +106,86 @@ module.exports = {
             })
         })
     },
+
+    forgotPassword: (req, res) => {
+        const q = "SELECT * FROM users WHERE email = ?";
+
+        db.query(q, [req.body.email], (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length === 0)
+                return res.status(404).json({ msg: "User does not exist" });
+
+            const token = jwt.sign({ email: data[0].email, id: data[0].id }, "JWT", { expiresIn: '1h' });
+            const link = `http://${req.headers.host}/auth/reset-password/${data[0].id}/${token}`;
+            console.log(link);
+
+            const mailOptions = {
+                from: "Reset password",
+                to: req.body.email,
+                subject: ' "Reset password" <ihzasukarya@gmail.com>',
+                html: link
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error)
+                    return res.status(500).json(error)
+                } else {
+                    console.log("Email sent: " + info.response)
+                    return res.status(200).json({ msg: "New password. Please check your email to verify your account." })
+                }
+            })
+
+
+            res.status(200).json({ token: token, link: link, msg: "Success" });
+        });
+    },
+
+    resetPassword: (req, res) => {
+        const { id, token } = req.params;
+        console.log(req.params);
+        console.log(id);
+
+        try {
+            const verify = jwt.verify(token, "JWT")
+            res.status(200).render("index", { email: verify.email });
+        } catch (error) {
+            console.log(error);
+            res.status(404).json({ msg: "Not Verified" });
+        }
+    },
+
+    resetPasswordTwo: (req, res) => {
+        const { id, token } = req.params;
+        const { password } = req.body;
+
+        try {
+
+            const verify = jwt.verify(token, "JWT");
+            const q = "SELECT * FROM users WHERE id = ?";
+            db.query(q, [id], (err, data) => {
+                if (err) return res.status(500).json(err);
+                if (data.length === 0) {
+                    return res.status(404).json({ msg: "User not found!" });
+                } else {
+                    // Hash pass
+                    const encryptedPassword = bcrypt.hashSync(password, 10);
+
+                    const updateQ = "UPDATE users SET password = ? WHERE id = ?";
+                    db.query(updateQ, [encryptedPassword, id], (err, result) => {
+                        if (err) return res.status(500).json(err);
+                        res.status(200).json({ msg: "Password updated successfully!" });
+                        res.redirect('/login');
+                    });
+                }
+            });
+            res.status(500).json({ msg: "Password updated" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ msg: "Failed to update password!" });
+        }
+    },
+
 
     login: (req, res) => {
         const q = "SELECT * FROM users WHERE username = ? OR email = ?"
