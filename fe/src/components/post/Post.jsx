@@ -2,8 +2,8 @@ import "./post.scss";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
-import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EditIcon from "@mui/icons-material/Edit";
 import {Link} from "react-router-dom";
 import Comments from "../comments/Comments";
 import {useContext, useState} from "react";
@@ -113,11 +113,11 @@ const Post = ({post}) => {
             <TextsmsOutlinedIcon />
             Comments
           </div>
-          <div className="content">
+          <div className="item">
             <Link to={`/post/${post.id}`}>Detail</Link>
           </div>
           <div className="item">
-            <ShareOutlinedIcon />
+            <EditIcon />
             <div
               className="item"
               onClick={() => setCommentOpen(!editOpen)}></div>

@@ -52,7 +52,6 @@ const Share = () => {
       <div className="container">
         <div className="top">
           <div className="left">
-            {/* <img src={"/upload/" + currentUser.profilePic} alt="" /> */}
             <input
               type="text"
               placeholder={`What's on your mind ${currentUser.username}?`}
@@ -82,12 +81,8 @@ const Share = () => {
               </div>
             </label>
             <div className="item">
-              <img src={Map} alt="" />
+              <img src={Map} alt="gdg" />
               <span>Add Place</span>
-            </div>
-            <div className="item">
-              <img src={Friend} alt="" />
-              <span>Tag Friends</span>
             </div>
           </div>
           <div className="right">

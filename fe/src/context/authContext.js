@@ -8,9 +8,7 @@ export const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
-  const [accessToken, setAccessToken] = useState("")
 
-  localStorage.setItem("accToken", accessToken)
 
   const login = async (input) => {
     //TO DO
@@ -19,7 +17,7 @@ export const AuthContextProvider = ({ children }) => {
     })
     console.log(res);
     setCurrentUser(res.data.others)
-    setAccessToken(res.data.token)
+    localStorage.setItem("logoutToken", res.data.token)
   };
 
   useEffect(() => {

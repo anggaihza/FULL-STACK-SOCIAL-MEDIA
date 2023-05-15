@@ -29,11 +29,6 @@ const PostDetail = () => {
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img
-              src={"/upload/" + post.profilePic}
-              alt="www"
-              className="profilePic"
-            />
             <div className="details">
               <Link
                 to={`/profile/${post.userId}`}
@@ -54,7 +49,7 @@ const PostDetail = () => {
             <FavoriteOutlinedIcon
               style={{color: post.isLiked ? "red" : "inherit"}}
             />
-            {post.likes} Likes
+            {post.numLikes} Likes
           </div>
           <div className="item">
             <TextsmsOutlinedIcon />

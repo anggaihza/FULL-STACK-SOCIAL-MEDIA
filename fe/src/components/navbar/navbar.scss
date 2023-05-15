@@ -23,6 +23,7 @@
         font-weight: bold;
         font-size: 20px;
         color: themed("logo");
+        margin-left: 10px;
       }
 
       .search {
@@ -34,17 +35,13 @@
         padding: 5px;
 
         input {
+          flex: 1;
           border: none;
-          width: 500px;
           background-color: transparent;
           color: themed("textColor");
 
           @include mobile {
             display: none;
-          }
-
-          @include tablet {
-            width: 200px;
           }
         }
       }
@@ -66,7 +63,12 @@
         font-weight: 500;
 
         @include tablet {
-          display: none;
+          display: flex;
+        }
+
+        span {
+          margin-right: 22px;
+          margin-bottom: 60px;
         }
 
         img {
@@ -75,9 +77,21 @@
           border-radius: 50%;
           object-fit: cover;
         }
+      }
+    }
 
-        span {
-        }
+    .profile-btn,
+    .logout-btn {
+      padding: 8px 12px;
+      border-radius: 4px;
+      background-color: themed("primary");
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+
+      &:hover {
+        background-color: darken(themed("primary"), 10%);
       }
     }
   }

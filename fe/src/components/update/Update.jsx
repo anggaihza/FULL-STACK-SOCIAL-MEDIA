@@ -17,6 +17,7 @@ const Update = ({setOpenUpdate, user}) => {
       const formData = new FormData();
       formData.append("file", file);
       const res = await makeRequest.post("/upload", formData);
+      console.log(res.data);
       return res.data;
     } catch (error) {
       console.log(error);

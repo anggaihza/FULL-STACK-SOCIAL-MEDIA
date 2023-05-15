@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 
-// const express = require("express")
-// const app = express()
-// app.set("view engine", "ejs")
+const express = require("express")
+const app = express()
+app.set("view engine", "ejs")
 
 // Import the email template file
 const fs = require("fs")
@@ -14,14 +14,17 @@ const emailTemplatePath = path.join(__dirname, "email-verification.html");
 const emailTemplate = fs.readFileSync(emailTemplatePath, "utf8");
 // const emailTemplate = fs.readFileSync("./email-verification.html", "utf8")
 
+
 // set up nodemailer ##
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: "ihzasukarya@gmail.com",
-        pass: "sqnlrlrfopagejex"
+        pass: "bejjhsfacfwufhnd"
     }
 })
+
+
 
 module.exports = {
     register: (req, res) => {
@@ -62,8 +65,6 @@ module.exports = {
                 const verificationLink = `http://${req.headers.host}/auth/verify-email/${token_verification}`
                 const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink)
 
-
-
                 const mailOptions = {
                     from: "verify your email",
                     to: req.body.email,
@@ -80,14 +81,37 @@ module.exports = {
                         return res.status(200).json({ msg: "User has been created. Please check your email to verify your account." })
                     }
                 })
-
             })
+        })
+    },
+
+    buttonVerification: (req, res) => {
+        const token_verification = jwt.sign({ email: req.body.email }, "JWT")
+
+        const verificationLink = `http://${req.headers.host}/auth/verify-email/${token_verification}`
+        const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink)
+
+        const mailOptions = {
+            from: "verify your email",
+            to: req.body.email,
+            subject: ' "Email Verification" <ihzasukarya@gmail.com>',
+            html: emailContent
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error)
+                return res.status(500).json(error)
+            } else {
+                console.log("Email sent: " + info.response)
+                return res.status(200).json({ msg: "Please check your email to verify your account." })
+            }
         })
     },
 
     verifyEmail: (req, res) => {
         const verificationToken = req.params.token
-        jwt.verify(verificationToken, "VERIFY", (err, decoded) => {
+        jwt.verify(verificationToken, "JWT", (err, decoded) => {
             if (err) return res.status(400).json({ msg: "Invalid verification token." })
 
             const q = "SELECT * FROM users WHERE email = ? AND verification_token = ? AND status = 'unverified'"
@@ -96,7 +120,6 @@ module.exports = {
                 if (data.length === 0) return res.status(400).json({ msg: "Invalid verification token." })
 
                 const q = "UPDATE users SET status = 'verified', verification_token = '' WHERE email = ?"
-
                 db.query(q, [decoded.email], (err, data) => {
                     if (err) return res.status(500).json(err)
 
@@ -136,7 +159,7 @@ module.exports = {
             })
 
 
-            res.status(200).json({ token: token, link: link, msg: "Success" });
+            res.status(200).json({ token: token, link: link, msg: "Success. Please check your email to reset your password." });
         });
     },
 

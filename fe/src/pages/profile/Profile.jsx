@@ -1,12 +1,8 @@
 import "./profile.scss";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+
 import Posts from "../../components/posts/Posts";
 import {makeRequest} from "../../axios";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {useLocation} from "react-router-dom";
 import Update from "../../components/update/Update";
 import {useState} from "react";
@@ -20,8 +16,23 @@ const Profile = () => {
       return res.data;
     })
   );
-
   console.log(data);
+
+  const resendEmailMutation = useMutation(
+    (verify) => {
+      return makeRequest.get(`/auth/verify-email/${data.verification_token}`);
+    },
+    {
+      onSuccess: () => {
+        alert("Verification email success");
+      },
+    }
+  );
+
+  const handleEmail = () => {
+    resendEmailMutation.mutate();
+  };
+
   return (
     <>
       <div className="profile">
@@ -46,12 +57,15 @@ const Profile = () => {
             </div>
             <div className="right">
               <div>
-                <button onClick={() => setOpenUpdate(true)}>update</button>
-                <button onClick={() => setOpenUpdate(true)}>
-                  Verification
-                </button>
+                {data?.status === "verified" ? (
+                  <button onClick={() => setOpenUpdate(true)}>update</button>
+                ) : (
+                  <>
+                    <button onClick={() => setOpenUpdate(true)}>update</button>
+                    <button onClick={handleEmail}>Verification</button>
+                  </>
+                )}
               </div>
-              <MoreVertIcon />
             </div>
           </div>
           <Posts />

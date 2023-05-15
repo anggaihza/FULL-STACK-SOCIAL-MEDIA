@@ -1,10 +1,12 @@
 .editPost {
   .editBtn {
     cursor: pointer;
-    color: #3367d6;
+    color: #0a44c0;
     &:hover {
-      background-color: #3367d6;
+      background-color: #1c59dd;
       color: #fff;
+      padding: 2px 8px;
+      border-radius: 5px;
     }
   }
 

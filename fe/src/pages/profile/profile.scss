@@ -27,6 +27,7 @@
         top: 200px;
       }
     }
+
     .profileContainer {
       padding: 20px 70px;
 
@@ -40,9 +41,6 @@
 
       .uInfo {
         height: 180px;
-        -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
         border-radius: 20px;
         background-color: themed("bg");
         color: themed("textColor");
@@ -51,6 +49,7 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
+        box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
 
         @include mobile {
           flex-direction: column;
@@ -103,6 +102,7 @@
               }
             }
           }
+
           button {
             border: none;
             background-color: #5271ff;
@@ -119,6 +119,7 @@
           align-items: center;
           justify-content: flex-end;
           gap: 10px;
+
           button {
             border: none;
             background-color: #5271ff;
@@ -127,6 +128,7 @@
             border-radius: 5px;
             cursor: pointer;
           }
+
           div {
             padding-top: 50px;
             display: flex;
