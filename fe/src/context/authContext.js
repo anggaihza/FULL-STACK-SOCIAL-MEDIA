@@ -8,6 +8,10 @@ export const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
+  const [accessToken, setAccessToken] = useState("")
+
+  localStorage.setItem("accToken", accessToken)
+
   const login = async (input) => {
     //TO DO
     const res = await axios.post("http://localhost:2000/auth/login", input, {
@@ -15,6 +19,7 @@ export const AuthContextProvider = ({ children }) => {
     })
     console.log(res);
     setCurrentUser(res.data.others)
+    setAccessToken(res.data.token)
   };
 
   useEffect(() => {

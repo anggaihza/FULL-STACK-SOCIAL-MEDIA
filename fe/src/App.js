@@ -17,6 +17,7 @@ import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query"
 import Reset from "./pages/reset/Reset";
+import PostDetail from "./components/postDetail/PostDetail";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -66,6 +67,10 @@ function App() {
         {
           path: "/profile/:id",
           element: <Profile />,
+        },
+        {
+          path: "/post/:postId",
+          element: <PostDetail />,
         },
       ],
     },

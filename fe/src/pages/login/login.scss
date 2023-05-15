@@ -19,7 +19,7 @@
           rgba(39, 11, 96, 0.5),
           rgba(39, 11, 96, 0.5)
         ),
-        url("https://images.pexels.com/photos/267355/pexels-photo-267355.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
+        url("https://images.pexels.com/photos/3750773/pexels-photo-3750773.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load")
           center;
       background-size: cover;
       padding: 50px;
@@ -53,7 +53,7 @@
 
     .right {
       flex: 1;
-      padding: 40px;
+      padding: 50px;
       display: flex;
       flex-direction: column;
       gap: 50px;
@@ -76,7 +76,7 @@
 
         button {
           width: 50%;
-          padding: 5px;
+          padding: 10px;
           border: none;
           background-color: #938eef;
           color: white;
@@ -88,7 +88,7 @@
         height: 30px;
         display: flex;
         border: none;
-        padding: 4px 8px;
+        padding: 7px 8px;
         background-color: #663399;
         color: white;
         border-radius: 20px;
@@ -99,7 +99,6 @@
           border: none;
           margin: auto;
           color: white;
-          font-weight: bold;
           font-size: 12px;
           background: none;
         }

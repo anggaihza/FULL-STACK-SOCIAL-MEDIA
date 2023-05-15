@@ -113,6 +113,9 @@ const Post = ({post}) => {
             <TextsmsOutlinedIcon />
             Comments
           </div>
+          <div className="content">
+            <Link to={`/post/${post.id}`}>Detail</Link>
+          </div>
           <div className="item">
             <ShareOutlinedIcon />
             <div

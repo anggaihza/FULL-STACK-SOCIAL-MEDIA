@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 
-const express = require("express")
-const app = express()
-app.set("view engine", "ejs")
+// const express = require("express")
+// const app = express()
+// app.set("view engine", "ejs")
 
 // Import the email template file
 const fs = require("fs")
@@ -81,7 +81,6 @@ module.exports = {
                     }
                 })
 
-                // return res.status(200).json({ msg: "User has been created" })
             })
         })
     },
@@ -197,7 +196,7 @@ module.exports = {
             const checkPassword = bcrypt.compareSync(req.body.password, data[0].password)
             if (!checkPassword) return res.status(400).json({ msg: "Wrong password" })
 
-            const token = jwt.sign({ id: data[0].id }, "JWT")
+            const token = jwt.sign({ id: data[0].id }, "JWT", { expiresIn: '2h' })
 
             const { password, ...others } = data[0]
 

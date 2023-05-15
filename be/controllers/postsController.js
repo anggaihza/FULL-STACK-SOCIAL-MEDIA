@@ -2,6 +2,8 @@ const moment = require("moment/moment")
 const { db } = require("../db")
 const jwt = require("jsonwebtoken")
 
+
+
 module.exports = {
     getPosts: (req, res) => {
         const token = req.cookies.accessToken
@@ -90,4 +92,41 @@ module.exports = {
             });
         });
     },
+    // router.get("/posts/:id", postsController.postDetail)
+    postDetail: (req, res) => {
+
+        //////////////////
+        const token = req.cookies.accessToken;
+        if (!token) return res.status(401).json({ msg: "Not logged in!" });
+
+        jwt.verify(token, "JWT", (err, userInfo) => {
+            if (err) return res.status(400).json({ msg: "Token is not valid!" });
+
+            // hre
+            const q = `SELECT p.*, u.username, l.userId AS likedByUserId, (
+                SELECT COUNT(*) FROM likes WHERE postId = p.id
+              ) AS numLikes
+              FROM posts AS p
+              JOIN users AS u ON (u.id = p.userId)
+              LEFT JOIN likes AS l ON (p.id = l.postId AND l.userId = ?)
+              WHERE p.id = ?`;
+            db.query(q, [userInfo.id, req.params.postId], (err, post) => {
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+
+                const q2 = `SELECT c.*, u.username FROM comments AS c JOIN users AS u ON (u.id = c.userId) WHERE c.postId = ? ORDER BY c.createdAt DESC LIMIT 5`;
+                db.query(q2, [req.params.postId], (err, comments) => {
+                    if (err) {
+                        return res.status(500).json(err);
+                    }
+                    console.log(req.user);
+
+                    res.status(200).json({ post: post, comments });
+                });
+            });
+        });
+    }
+
 }
