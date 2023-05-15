@@ -5,7 +5,8 @@ import {makeRequest} from "../../axios";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useLocation} from "react-router-dom";
 import Update from "../../components/update/Update";
-import {useState} from "react";
+import {useContext, useState} from "react";
+import {AuthContext} from "../../context/authContext";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -18,9 +19,11 @@ const Profile = () => {
   );
   console.log(data);
 
+  const {currentUser} = useContext(AuthContext);
+
   const resendEmailMutation = useMutation(
-    (verify) => {
-      return makeRequest.get(`/auth/verify-email/${data.verification_token}`);
+    (token) => {
+      return makeRequest.post(`/auth/verify/${currentUser.verification_token}`);
     },
     {
       onSuccess: () => {
@@ -29,8 +32,8 @@ const Profile = () => {
     }
   );
 
-  const handleEmail = () => {
-    resendEmailMutation.mutate();
+  const handleEmail = (token) => {
+    resendEmailMutation.mutate(token);
   };
 
   return (

@@ -57,6 +57,7 @@ module.exports = {
             const q = "INSERT INTO users (`username`, `email`, `password`, `status`, `verification_token`) VALUES (?, ?, ?, ?, ?)"
 
             const token_verification = jwt.sign({ email: req.body.email }, "JWT")
+
             const values = [req.body.username, req.body.email, hashedPassword, "unverified", token_verification]
             db.query(q, values, (err, data) => {
                 if (err) return res.status(500).json(err)
@@ -85,27 +86,41 @@ module.exports = {
         })
     },
 
-    buttonVerification: (req, res) => {
-        const token_verification = jwt.sign({ email: req.body.email }, "JWT")
+    resendVerification: (req, res) => {
 
-        const verificationLink = `http://${req.headers.host}/auth/verify-email/${token_verification}`
-        const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink)
+        const verificationToken = req.params.token;
 
-        const mailOptions = {
-            from: "verify your email",
-            to: req.body.email,
-            subject: ' "Email Verification" <ihzasukarya@gmail.com>',
-            html: emailContent
-        }
+        jwt.verify(verificationToken, 'JWT', (err, decoded) => {
+            if (err) return res.status(400).json({ msg: 'Invalid verification token.' });
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error)
-                return res.status(500).json(error)
-            } else {
-                console.log("Email sent: " + info.response)
-                return res.status(200).json({ msg: "Please check your email to verify your account." })
-            }
+            const newVerificationToken = jwt.sign({ email: decoded.email }, 'JWT');
+
+            const verificationLink = `http://${req.headers.host}/auth/verify-email/${newVerificationToken}`;
+            const emailContent = emailTemplate.replace('{{verificationLink}}', verificationLink);
+
+            const insertQuery = "UPDATE users SET verification_token = ?"
+            const values = [newVerificationToken];
+
+            console.log(decoded.email);
+
+            db.query(insertQuery, values, (err, data) => {
+                const mailOptions = {
+                    from: 'verify your email',
+                    to: decoded.email,
+                    subject: 'Email Verification <ihzasukarya@gmail.com>',
+                    html: emailContent,
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                        return res.status(200).json({ data, msg: 'Please check your email to verify your account.' });
+                    }
+                });
+            });
         })
     },
 
@@ -114,13 +129,13 @@ module.exports = {
         jwt.verify(verificationToken, "JWT", (err, decoded) => {
             if (err) return res.status(400).json({ msg: "Invalid verification token." })
 
-            const q = "SELECT * FROM users WHERE email = ? AND verification_token = ? AND status = 'unverified'"
-            db.query(q, [decoded.email, verificationToken], (err, data) => {
+            const selectQuery = "SELECT * FROM users WHERE email = ? AND verification_token = ? AND status = 'unverified'"
+            db.query(selectQuery, [decoded.email, verificationToken], (err, data) => {
                 if (err) return res.status(500).json(err)
                 if (data.length === 0) return res.status(400).json({ msg: "Invalid verification token." })
 
-                const q = "UPDATE users SET status = 'verified', verification_token = '' WHERE email = ?"
-                db.query(q, [decoded.email], (err, data) => {
+                const updateQuery = "UPDATE users SET status = 'verified', verification_token = '' WHERE email = ?"
+                db.query(updateQuery, [decoded.email], (err, data) => {
                     if (err) return res.status(500).json(err)
 
                     res.status(200).json({ msg: "Email verification successful." })
@@ -208,7 +223,6 @@ module.exports = {
         }
     },
 
-
     login: (req, res) => {
         const q = "SELECT * FROM users WHERE username = ? OR email = ?"
 
@@ -236,3 +250,4 @@ module.exports = {
         }).status(200).json({ msg: "User has been logged Out" })
     }
 }
+
