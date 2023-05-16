@@ -28,7 +28,7 @@ const Profile = () => {
     },
     {
       onSuccess: () => {
-        alert("Verification email success");
+        alert("Please check your email to verify your account.");
       },
     }
   );

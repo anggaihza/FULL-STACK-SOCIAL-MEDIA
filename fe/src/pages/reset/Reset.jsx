@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import "./reset.scss";
 import axios from "axios";
@@ -9,8 +9,6 @@ const Reset = () => {
   });
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setInput((prev) => ({...prev, [e.target.name]: e.target.value}));

@@ -1,11 +1,11 @@
 import "./navbar.scss";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useContext} from "react";
 import {AuthContext} from "../../context/authContext";
 import {makeRequest} from "../../axios";
-import {QueryClient, useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 
 const Navbar = () => {
   const {currentUser} = useContext(AuthContext);
