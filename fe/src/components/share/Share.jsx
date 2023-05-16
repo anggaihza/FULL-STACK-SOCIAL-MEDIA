@@ -1,6 +1,5 @@
 import "./share.scss";
 import Image from "../../assets/img.png";
-import Map from "../../assets/map.png";
 import {useContext, useState} from "react";
 import {AuthContext} from "../../context/authContext";
 import {makeRequest} from "../../axios";
@@ -80,10 +79,6 @@ const Share = () => {
                 <span>Add Image</span>
               </div>
             </label>
-            <div className="item">
-              <img src={Map} alt="gdg" />
-              <span>Add Place</span>
-            </div>
           </div>
           <div className="right">
             {access ? <button onClick={handleClick}>Share</button> : null}

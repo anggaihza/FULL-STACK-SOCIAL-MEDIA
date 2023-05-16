@@ -97,7 +97,7 @@ const Register = () => {
             <div className="password-field">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
+                placeholder="Repeat Password"
                 name="confirmPassword"
                 onChange={handleChange}
               />

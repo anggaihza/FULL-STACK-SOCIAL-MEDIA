@@ -1,6 +1,6 @@
-CREATE SCHEMA sosmed;
+CREATE SCHEMA social;
 
-CREATE TABLE sosmed.users (
+CREATE TABLE social.users (
   id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(45) NOT NULL,
   email VARCHAR(45) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE sosmed.users (
   reset_password_token VARCHAR(255)
 );
 
-CREATE TABLE sosmed.posts (
+CREATE TABLE social.posts (
   id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
   caption VARCHAR(255),
   image VARCHAR(255),
@@ -23,7 +23,7 @@ CREATE TABLE sosmed.posts (
   FOREIGN KEY (userId) REFERENCES sosmed.users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE sosmed.comments (
+CREATE TABLE social.comments (
   id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
   `desc` VARCHAR(255),
   createdAt DATETIME,
@@ -33,10 +33,11 @@ CREATE TABLE sosmed.comments (
   FOREIGN KEY (postId) REFERENCES sosmed.posts(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE sosmed.likes (
+CREATE TABLE social.likes (
   id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
   userId INT NOT NULL,
   postId INT NOT NULL,
   FOREIGN KEY (userId) REFERENCES sosmed.users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (postId) REFERENCES sosmed.posts(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+

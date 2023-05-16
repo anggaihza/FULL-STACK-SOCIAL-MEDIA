@@ -28,82 +28,95 @@ const transporter = nodemailer.createTransport({
 
 module.exports = {
     register: (req, res) => {
-        const q = `SELECT * FROM users where username = ?`
-        db.query(q, [req.body.username], (err, data) => {
-            if (err) return res.status(500).json(err)
-            if (data.length) return res.status(400).json({ msg: "User already exists!" })
+        const usernameQuery = `SELECT * FROM users WHERE username = ?`;
+        const emailQuery = `SELECT * FROM users WHERE email = ?`;
 
-            if (req.body.password !== req.body.confirmPassword) {
-                return res.status(400).json({ msg: "Passwords do not match!" })
+        db.query(usernameQuery, [req.body.username], (err, usernameData) => {
+            if (err) return res.status(500).json(err);
+            if (usernameData.length) {
+                return res.status(400).json({ msg: "Username already exists!" });
             }
 
-            // Password validation
-            const passwordRequirements = [
-                {
-                    regex: /(?=.*\d)/,
-                    message: "Password should contain at least one digit.",
-                },
-                {
-                    regex: /(?=.*[a-z])/,
-                    message: "Password should contain at least one lowercase letter.",
-                },
-                {
-                    regex: /(?=.*[A-Z])/,
-                    message: "Password should contain at least one uppercase letter.",
-                },
-                {
-                    regex: /^[0-9a-zA-Z]{8,}$/,
-                    message: "Password should contain at least 8 characters.",
-                },
-            ];
-
-            for (const requirement of passwordRequirements) {
-                if (!requirement.regex.test(req.body.password)) {
-                    return res.status(400).json({ msg: requirement.message });
-                }
-            }
-
-            // Email validation
-            const emailRegex = /^\S+@\S+\.\S+$/
-            if (!emailRegex.test(req.body.email)) {
-                return res.status(400).json({ msg: "Invalid email format." })
-            }
-
-            // Hash pass
-            const salt = bcrypt.genSaltSync(10)
-            const hashedPassword = bcrypt.hashSync(req.body.password, salt)
-
-            // create user
-            const q = "INSERT INTO users (`username`, `email`, `password`, `status`, `verification_token`) VALUES (?, ?, ?, ?, ?)"
-
-            const token_verification = jwt.sign({ email: req.body.email }, "JWT")
-
-            const values = [req.body.username, req.body.email, hashedPassword, "unverified", token_verification]
-            db.query(q, values, (err, data) => {
-                if (err) return res.status(500).json(err)
-
-
-                const verificationLink = `http://${req.headers.host}/auth/verify-email/${token_verification}`
-                const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink)
-
-                const mailOptions = {
-                    from: "verify your email",
-                    to: req.body.email,
-                    subject: ' "Email Verification" <ihzasukarya@gmail.com>',
-                    html: emailContent
+            db.query(emailQuery, [req.body.email], (err, emailData) => {
+                if (err) return res.status(500).json(err);
+                if (emailData.length) {
+                    return res.status(400).json({ msg: "Email already exists!" });
                 }
 
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.log(error)
-                        return res.status(500).json(error)
-                    } else {
-                        console.log("Email sent: " + info.response)
-                        return res.status(200).json({ msg: "User has been created. Please check your email to verify your account." })
+                if (req.body.password !== req.body.confirmPassword) {
+                    return res.status(400).json({ msg: "Passwords do not match!" });
+                }
+
+                // Email validation
+                const emailRegex = /^\S+@\S+\.\S+$/;
+                if (!emailRegex.test(req.body.email)) {
+                    return res.status(400).json({ msg: "Invalid email format." });
+                }
+
+                // Password validation
+                const passwordRequirements = [
+                    {
+                        regex: /(?=.*\d)/,
+                        message: "Password should contain at least one digit.",
+                    },
+                    {
+                        regex: /(?=.*[a-z])/,
+                        message: "Password should contain at least one lowercase letter.",
+                    },
+                    {
+                        regex: /(?=.*[A-Z])/,
+                        message: "Password should contain at least one uppercase letter.",
+                    },
+                    {
+                        regex: /(?=.*[!@#$%^&*])/,
+                        message: "Password should contain at least one symbol character.",
+                    },
+                    {
+                        regex: /^[0-9a-zA-Z!@#$%^&*]{8,}$/,
+                        message: "Password should contain at least 8 characters.",
+                    },
+                ];
+
+                for (const requirement of passwordRequirements) {
+                    if (!requirement.regex.test(req.body.password)) {
+                        return res.status(400).json({ msg: requirement.message });
                     }
-                })
-            })
-        })
+                }
+
+                // Hash pass
+                const salt = bcrypt.genSaltSync(10);
+                const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+
+                // Create user
+                const insertQuery = "INSERT INTO users (`username`, `email`, `password`, `status`, `verification_token`) VALUES (?, ?, ?, ?, ?)";
+                const tokenVerification = jwt.sign({ email: req.body.email }, "JWT");
+                const values = [req.body.username, req.body.email, hashedPassword, "unverified", tokenVerification];
+
+                db.query(insertQuery, values, (err, userData) => {
+                    if (err) return res.status(500).json(err);
+
+                    const verificationLink = `http://${req.headers.host}/auth/verify-email/${tokenVerification}`;
+                    const emailContent = emailTemplate.replace("{{verificationLink}}", verificationLink);
+
+                    const mailOptions = {
+                        from: "Verify your email",
+                        to: req.body.email,
+                        subject: 'Email Verification <ihzasukarya@gmail.com>',
+                        html: emailContent,
+                    };
+
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log(error);
+                            return res.status(500).json(error);
+                        } else {
+                            console.log("Email sent: " + info.response);
+                            return res.status(200).json({ msg: "User has been created. Please check your email to verify your account." });
+                        }
+                    });
+                });
+            });
+        });
     },
 
     resendVerification: (req, res) => {
