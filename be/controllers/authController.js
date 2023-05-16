@@ -38,9 +38,29 @@ module.exports = {
             }
 
             // Password validation
-            const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
-            if (!passwordRegex.test(req.body.password)) {
-                return res.status(400).json({ msg: "Password should contain at least 8 characters, one uppercase letter, one lowercase letter, and one number." })
+            const passwordRequirements = [
+                {
+                    regex: /(?=.*\d)/,
+                    message: "Password should contain at least one digit.",
+                },
+                {
+                    regex: /(?=.*[a-z])/,
+                    message: "Password should contain at least one lowercase letter.",
+                },
+                {
+                    regex: /(?=.*[A-Z])/,
+                    message: "Password should contain at least one uppercase letter.",
+                },
+                {
+                    regex: /^[0-9a-zA-Z]{8,}$/,
+                    message: "Password should contain at least 8 characters.",
+                },
+            ];
+
+            for (const requirement of passwordRequirements) {
+                if (!requirement.regex.test(req.body.password)) {
+                    return res.status(400).json({ msg: requirement.message });
+                }
             }
 
             // Email validation
@@ -193,14 +213,14 @@ module.exports = {
             db.query(q, [id, token], (err, data) => {
                 if (err) return res.status(500).json(err);
                 if (data.length === 0) {
-                    return res.status(404).json({ msg: "Not Verified" });
+                    return res.status(404).json({ msg: "Expired link" });
                 } else {
                     res.status(200).render("index", { email: verify.email });
                 }
             });
         } catch (error) {
             console.log(error);
-            res.status(404).json({ msg: "Not Verified" });
+            res.status(404).json({ msg: "Expired link" });
         }
     },
 

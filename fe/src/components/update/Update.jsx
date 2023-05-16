@@ -51,11 +51,26 @@ const Update = ({setOpenUpdate, user}) => {
     let coverUrl;
     let profileUrl;
 
-    coverUrl = cover ? await upload(cover) : user.coverPic;
-    profileUrl = cover ? await upload(profile) : user.profilePic;
+    try {
+      coverUrl = cover ? await upload(cover) : user.coverPic;
+      profileUrl = cover ? await upload(profile) : user.profilePic;
 
-    mutation.mutate({...texts, coverPic: coverUrl, profilePic: profileUrl});
-    setOpenUpdate(false);
+      const updatedUser = {
+        ...texts,
+        coverPic: coverUrl,
+        profilePic: profileUrl,
+      };
+      await mutation.mutateAsync(updatedUser);
+
+      setOpenUpdate(false);
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        alert(error.response.data.msg);
+      } else {
+        alert("An error occurred while updating the user.");
+      }
+    }
   };
 
   return (

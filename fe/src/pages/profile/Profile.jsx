@@ -20,6 +20,7 @@ const Profile = () => {
   console.log(data);
 
   const {currentUser} = useContext(AuthContext);
+  const access = currentUser.status === "verified";
 
   const resendEmailMutation = useMutation(
     (token) => {
@@ -55,6 +56,7 @@ const Profile = () => {
           <div className="uInfo">
             <div className="center">
               <span>{data?.fullname}</span>
+              <p>Username: {data?.username}</p>
               <p>Email: {data?.email}</p>
               <p className="bio">Bio: {data?.bio}</p>
             </div>
@@ -64,14 +66,13 @@ const Profile = () => {
                   <button onClick={() => setOpenUpdate(true)}>update</button>
                 ) : (
                   <>
-                    <button onClick={() => setOpenUpdate(true)}>update</button>
                     <button onClick={handleEmail}>Verification</button>
                   </>
                 )}
               </div>
             </div>
           </div>
-          <Posts />
+          {access ? <Posts /> : null}
         </div>
       </div>
       {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}

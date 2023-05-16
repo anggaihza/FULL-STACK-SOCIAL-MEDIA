@@ -60,7 +60,7 @@ const Login = () => {
           <form>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Username or email"
               name="username"
               onChange={handleChange}
             />
