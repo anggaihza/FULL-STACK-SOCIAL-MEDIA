@@ -16,6 +16,7 @@ import { AuthContext } from "./context/authContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Reset from "./pages/reset/Reset";
 import PostDetail from "./components/postDetail/PostDetail";
+import Posts from "./components/posts/Posts";
 
 
 function App() {
@@ -65,6 +66,10 @@ function App() {
         {
           path: "/profile/:id",
           element: <Profile />,
+        },
+        {
+          path: "/posts",
+          element: <Posts />,
         },
         {
           path: "/post/:postId",
