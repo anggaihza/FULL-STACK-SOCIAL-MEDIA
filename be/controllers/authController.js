@@ -145,47 +145,59 @@ module.exports = {
     },
 
     forgotPassword: (req, res) => {
-        const q = "SELECT * FROM users WHERE email = ?";
+        const { email } = req.body;
 
-        db.query(q, [req.body.email], (err, data) => {
+        const selectQuery = "SELECT * FROM users WHERE email = ?";
+        db.query(selectQuery, [email], (err, data) => {
             if (err) return res.status(500).json(err);
-            if (data.length === 0)
-                return res.status(404).json({ msg: "User does not exist" });
+            if (data.length === 0) return res.status(404).json({ msg: "User does not exist" });
 
             const token = jwt.sign({ email: data[0].email, id: data[0].id }, "JWT", { expiresIn: '1h' });
-            const link = `http://${req.headers.host}/auth/reset-password/${data[0].id}/${token}`;
-            console.log(link);
 
-            const mailOptions = {
-                from: "Reset password",
-                to: req.body.email,
-                subject: ' "Reset password" <ihzasukarya@gmail.com>',
-                html: link
-            }
+            const invalidateQuery = "UPDATE users SET reset_password_token = ? WHERE email = ?";
+            db.query(invalidateQuery, [token, email], (err, result) => {
+                if (err) return res.status(500).json(err);
 
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log(error)
-                    return res.status(500).json(error)
-                } else {
-                    console.log("Email sent: " + info.response)
-                    return res.status(200).json({ msg: "New password. Please check your email to verify your account." })
-                }
-            })
+                const id = data[0].id;
 
+                const resetLink = `http://${req.headers.host}/auth/reset-password/${id}/${token}`;
+                // console.log(data[0].id);
 
-            res.status(200).json({ token: token, link: link, msg: "Success. Please check your email to reset your password." });
+                const mailOptions = {
+                    from: "Reset password",
+                    to: email,
+                    subject: 'Reset Password',
+                    html: `<p>Hello,</p><p>You have requested to reset your password. Please click the link below to reset your password:</p><a href="${resetLink}">${resetLink}</a><p>If you did not request this, please ignore this email.</p>`
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json(error);
+                    } else {
+                        console.log("Email sent: " + info.response);
+                        return res.status(200).json({ msg: "New password request sent. Please check your email to reset your password." });
+                    }
+                });
+            });
         });
     },
 
     resetPassword: (req, res) => {
         const { id, token } = req.params;
-        console.log(req.params);
-        console.log(id);
 
         try {
-            const verify = jwt.verify(token, "JWT")
-            res.status(200).render("index", { email: verify.email });
+            const verify = jwt.verify(token, "JWT");
+
+            const q = "SELECT * FROM users WHERE id = ? AND reset_password_token = ?";
+            db.query(q, [id, token], (err, data) => {
+                if (err) return res.status(500).json(err);
+                if (data.length === 0) {
+                    return res.status(404).json({ msg: "Not Verified" });
+                } else {
+                    res.status(200).render("index", { email: verify.email });
+                }
+            });
         } catch (error) {
             console.log(error);
             res.status(404).json({ msg: "Not Verified" });
@@ -197,7 +209,6 @@ module.exports = {
         const { password } = req.body;
 
         try {
-
             const verify = jwt.verify(token, "JWT");
             const q = "SELECT * FROM users WHERE id = ?";
             db.query(q, [id], (err, data) => {
@@ -207,16 +218,13 @@ module.exports = {
                 } else {
                     // Hash pass
                     const encryptedPassword = bcrypt.hashSync(password, 10);
-
-                    const updateQ = "UPDATE users SET password = ? WHERE id = ?";
+                    const updateQ = "UPDATE users SET password = ?, reset_password_token = NULL WHERE id = ?";
                     db.query(updateQ, [encryptedPassword, id], (err, result) => {
                         if (err) return res.status(500).json(err);
-                        res.status(200).json({ msg: "Password updated successfully!" });
-                        res.redirect('/login');
+                        return res.status(200).json({ msg: "Update password success" });
                     });
                 }
             });
-            res.status(500).json({ msg: "Password updated" });
         } catch (error) {
             console.log(error);
             res.status(500).json({ msg: "Failed to update password!" });
